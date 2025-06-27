@@ -6,9 +6,8 @@ import subprocess
 import time
 from pathlib import Path
 
-from .pose_estimator import PoseEstimator
+from pose_estimation.pose_estimator import PoseEstimator
 
-# ... (XdotoolPoseEstimator 클래스 정의는 이전과 동일하게 유지) ...
 def _empty_callback(value):
     pass
 
@@ -17,7 +16,7 @@ class XdotoolPoseEstimator(PoseEstimator):
     PoseEstimator를 상속받아 근접 감지 시 xdotool 명령을 실행하는 기능을 추가한 클래스.
     """
     def __init__(self, model_name="human-pose-estimation-0001", precision="FP16-INT8", device="AUTO",
-                 proximity_threshold=0.15, 
+                 proximity_threshold=0.20, 
                  trigger_command="xdotool key 'super+l'"):
         super().__init__(model_name=model_name, precision=precision, device=device)
         self.proximity_threshold = proximity_threshold
@@ -118,7 +117,7 @@ def run_proximity_trigger_example():
     
     # 세부 파라미터 설정은 이 함수 내에서 이루어집니다.
     estimator = XdotoolPoseEstimator(
-        proximity_threshold=0.2,
+        proximity_threshold=0.5,
         trigger_command="xdotool set_desktop 1"
     )
     

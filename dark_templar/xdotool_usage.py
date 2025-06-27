@@ -6,7 +6,7 @@ import subprocess
 import time
 from pathlib import Path
 
-from ..pose_estimator import PoseEstimator
+from pose_estimation.pose_estimator import PoseEstimator
 
 # ... (XdotoolPoseEstimator 클래스 정의는 이전과 동일하게 유지) ...
 def _empty_callback(value):
