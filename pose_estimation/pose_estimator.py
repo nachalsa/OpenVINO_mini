@@ -124,30 +124,50 @@ class PoseEstimator:
         """비디오/웹캠에서 포즈 추정"""
         if self.compiled_model is None: self.initialize_model()
         
+        # 비디오 소스 열기
         cap = cv2.VideoCapture(str(source)) if isinstance(source, (str, Path)) else cv2.VideoCapture(source)
-        if not cap.isOpened(): raise ValueError(f"Could not open video source: {source}")
+        if not cap.isOpened(): 
+            raise ValueError(f"Could not open video source: {source}")
         
+        # 비디오 라이터 초기화
         writer = None
         if output_path:
             fps = int(cap.get(cv2.CAP_PROP_FPS))
-            w, h = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            # 비디오 프레임 크기를 가져올 때, 원본 영상의 크기를 사용하도록 보장
+            w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+            h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
             writer = cv2.VideoWriter(str(output_path), cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
         
+        # 팝업 윈도우 설정
         if use_popup:
             title = "Pose Estimation - Press ESC to Exit"
             cv2.namedWindow(title, cv2.WINDOW_GUI_NORMAL | cv2.WINDOW_AUTOSIZE)
         
         frame_count = 0
         try:
+            # 초기 프레임 스킵
             for _ in range(skip_first_frames):
-                if not cap.read()[0]: break
+                ret, _ = cap.read()
+                if not ret:
+                    print("Could not skip frames, video source might be too short.")
+                    break
             
             while True:
+                # 프레임 읽기
                 ret, frame = cap.read()
-                if not ret: break
-                if max_frames and frame_count >= max_frames: break
+                if not ret:
+                    print("Video stream ended or failed to read frame.")
+                    break
                 
-                input_img, _ = self.preprocess_image(frame, max_size=None)
+                # 최대 프레임 제한
+                if max_frames and frame_count >= max_frames:
+                    print(f"Reached max frames limit: {max_frames}")
+                    break
+                
+                # 원본 프레임 복사본으로 추론 및 시각화 진행
+                display_frame = frame.copy()
+
+                input_img, _ = self.preprocess_image(display_frame, max_size=None)
                 
                 start_time = time.time()
                 results = self.compiled_model([input_img])
@@ -155,30 +175,48 @@ class PoseEstimator:
                 
                 pafs = results[self.pafs_output_key]
                 heatmaps = results[self.heatmaps_output_key]
-                poses, _ = self._postprocess(pafs, heatmaps, frame)
+                poses, _ = self._postprocess(pafs, heatmaps, display_frame)
                 
-                result_frame = self.visualizer.draw_poses(frame, poses, 0.1)
+                result_frame = self.visualizer.draw_poses(display_frame, poses, 0.1)
                 avg_time_ms = self.video_utils.get_avg_processing_time_ms()
                 fps = self.video_utils.get_fps()
                 result_frame = self.visualizer.add_performance_info(result_frame, avg_time_ms, fps)
                 
-                if writer: writer.write(result_frame)
-                
+                if writer:
+                    # 저장할 때는 원본 해상도와 맞는지 확인
+                    if result_frame.shape[0] != h or result_frame.shape[1] != w:
+                         # 만약 디스플레이 프레임 크기가 다르다면 원본 크기로 리사이즈
+                         result_frame_to_write = cv2.resize(result_frame, (w, h))
+                         writer.write(result_frame_to_write)
+                    else:
+                         writer.write(result_frame)
+
                 if use_popup:
                     cv2.imshow(title, result_frame)
-                    if cv2.waitKey(1) & 0xFF == 27: break
+                    key = cv2.waitKey(1)
+                    if key == 27:  # ESC 키
+                        print("ESC key pressed. Exiting.")
+                        break
                 else:
                     self.video_utils.display_frame_notebook(result_frame)
                 
                 frame_count += 1
                 
-        except KeyboardInterrupt: print("Interrupted by user")
+        except KeyboardInterrupt:
+            print("Interrupted by user.")
+        except Exception as e:
+            # 파이썬 레벨에서 잡을 수 있는 다른 예외 처리
+            print(f"An unexpected error occurred: {e}")
         finally:
-            cap.release()
-            if writer: writer.release()
-            if use_popup: cv2.destroyAllWindows()
-            print(f"Processed {frame_count} frames.")
-    
+            print("Releasing resources...")
+            if cap.isOpened():
+                cap.release()
+            if writer:
+                writer.release()
+            if use_popup:
+                cv2.destroyAllWindows()
+            print(f"Processing finished. Total frames processed: {frame_count}.")
+
     def estimate_pose_webcam(self, camera_id=0, use_popup=True):
         """웹캠에서 실시간 포즈 추정"""
         self.estimate_pose_video(source=camera_id, use_popup=use_popup)
