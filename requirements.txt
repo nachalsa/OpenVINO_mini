@@ -1,0 +1,6 @@
+# requirements.txt 파일
+openvino>=2023.1.0
+opencv-python
+numpy
+requests
+ipython
