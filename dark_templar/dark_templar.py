@@ -1,14 +1,12 @@
-# pose_estimation/xdotool_usage.py
+# dark_templar.py
 
 import cv2
 import numpy as np
 import subprocess
 import time
 from pathlib import Path
-
 from pose_estimation.pose_estimator import PoseEstimator
 
-# ... (XdotoolPoseEstimator 클래스 정의는 이전과 동일하게 유지) ...
 def _empty_callback(value):
     pass
 
@@ -107,7 +105,7 @@ class XdotoolPoseEstimator(PoseEstimator):
 
 
 # --- 이 파일의 기능을 실행하는 함수 ---
-def run_proximity_trigger_example():
+def run_dark_templar(proximity_threshold=0.5):
     """
     웹캠 근접 감지 트리거 예제를 실행합니다.
     이 함수는 XdotoolPoseEstimator의 생성과 실행을 모두 캡슐화합니다.
@@ -118,7 +116,7 @@ def run_proximity_trigger_example():
     
     # 세부 파라미터 설정은 이 함수 내에서 이루어집니다.
     estimator = XdotoolPoseEstimator(
-        proximity_threshold=0.5,
+        proximity_threshold=proximity_threshold,
         trigger_command="xdotool set_desktop 1"
     )
     
