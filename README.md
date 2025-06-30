@@ -1,73 +1,62 @@
-# README.md 내용
-"""
-# OpenVINO Pose Estimation Package
+## 🛑 Peek-A-NO! : 접근 감지 기반 프라이버시 프로그램
 
-OpenVINO를 사용한 인간 포즈 추정 패키지입니다.
+> "누군가 다가오는 바로 그때... 신속하고 안전하게 지켜 주는 One & Only Solution 🤫"
 
-## 설치
+---
 
-```bash
-pip install -r requirements.txt
-```
+#### 📝 프로젝트 개요
 
-## 사용법
+OpenVINO™ 기반의 실시간 포즈 인식 기술을 활용해서, 컴퓨터 쪽으로 사람들이 다가오는 것을 감지하고 **화면을 자동으로 전환**해 줍니다.
 
-### 기본 사용
-```python
-from pose_estimation import PoseEstimator
+#### 🖥️ 주요 기능
 
-# 포즈 추정기 초기화
-estimator = PoseEstimator()
+1. 웹캠을 활용한 **실시간 사람 감지** 기능
+2. Bounding Box의 넓이 계산을 통한 **실시간 접근 여부 판단** 기능
+3. 사람의 접근 확인 후 즉시 실행되는 **화면 자동 전환** 기능
 
-# 단일 이미지에서 포즈 추정
-poses, scores, result = estimator.estimate_pose_single_image("image.jpg")
+#### 🧑‍🏫 사용자 시나리오
 
-# 웹캠에서 실시간 포즈 추정
-estimator.estimate_pose_webcam()
-```
+| 상황 | 동작 |
+| - | - |
+| 칼바람 나락에서 한타 진행 중... **"공부 잘하고 있니?"** 엄마의 방문! | **강의 영상 플레이어**로 자동 전환 😇 |
+| 썸남 · 썸녀랑 카톡 대화 중... **"뭐 하고 있어?"** 룸메이트의 접근! | 아무것도 없는 **바탕화면**으로 자동 전환 😏 |
+| 채용 공고 검색 중... **"보고서는 아직도 멀었나?"** 상사의 등장! | **문서 작업 프로그램**으로 자동 전환 🥹 |
 
-### 고급 사용
-```python
-# 커스텀 설정으로 초기화
-estimator = PoseEstimator(
-    model_name="human-pose-estimation-0001",
-    precision="FP16-INT8",
-    device="AUTO"
-)
+---
 
-# 디코더 파라미터 조정
-estimator.set_decoder_params(
-    score_threshold=0.2,
-    min_paf_alignment_score=0.1
-)
+#### 📚 기술 스택
 
-# 시각화 설정
-estimator.set_visualization_params(colors=custom_colors)
-```
+- Ubuntu 22.04+ (X11 환경 기준)
+- Python 3.10+
+- OpenVINO™ Toolkit
+- OpenCV
 
-## 폴더 구조
+#### 🧑‍💻 사용 방법
 
-```
-pose_estimation/
-├── __init__.py                 # 패키지 초기화
-├── pose_estimator.py          # 메인 클래스
-├── core/                      # 핵심 기능
-│   ├── __init__.py
-│   ├── decoder.py            # OpenPose 디코더 (후처리 포함)
-│   └── visualizer.py         # 시각화
-├── models/                   # 모델 관리
-│   ├── __init__.py
-│   └── model_manager.py      # 모델 다운로드/로드
-└── utils/                    # 유틸리티
-    ├── __init__.py
-    └── video_utils.py        # 비디오 처리
-```
+**1. 사전 준비**
+   - 이 프로그램을 실행하기 위해서는 웹캠을 준비해야 합니다.
+   - 이 프로그램은 **모니터의 뒤쪽을 촬영할 수 있도록 웹캠의 위치를 조정**해야 가장 효과적으로 동작합니다.
 
-## 예제
+**2. 의존성 패키치 설치**
+   ```shell
+   pip install -r requirements.txt
+   ```
 
-`example_usage.py` 파일을 참조하세요.
+**3. 프로그램 실행**
+   ```shell
+   python3 main.py
+   ```
 
-## 라이센스
+#### ⚠️ 유의 사항
 
-MIT License
-"""
+- 이 프로그램은 **컴퓨터의 화면을 주 화면에서 보조 화면으로 전환**합니다.
+   - 보조 화면에다가 아무 프로그램도 실행해 두지 않았을 경우, 아무것도 없는 바탕화면으로 전환됩니다.
+   - 특정한 프로그램으로 전환하고 싶을 경우, 보조 화면에다가 해당 프로그램을 미리 실행해 둬야 합니다.
+- 이 프로그램은 여러분의 가족, 친구, 학교 강사, 직장 동료, 그 외 다른 사람 · 조직으로부터 완전한 프라이버시를 보장하지 않습니다.
+
+---
+
+#### 🗃️ 레퍼런스
+
+- [Live Human Pose Estimation with OpenVINO™](https://github.com/openvinotoolkit/openvino_notebooks/tree/latest/notebooks/pose-estimation-webcam)
+- [ubuntu manuals : `xdotool`](https://manpages.ubuntu.com/manpages/jammy/en/man1/xdotool.1.html)
