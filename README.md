@@ -44,7 +44,7 @@ OpenVINO™ 기반의 실시간 포즈 인식 기술을 활용해서, 컴퓨터 
 
 **3. 프로그램 실행**
    ```shell
-   python3 example_usage.py
+   python3 main.py
    ```
 
 #### ⚠️ 유의 사항
